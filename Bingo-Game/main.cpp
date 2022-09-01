@@ -4,9 +4,11 @@
 using namespace std;
 
 int numArray[25] = {};
+int bingo = 0;
 
 void shuffle();
 void changeNum(int index);
+void bingoCheck();
 
 int main() {
 	srand((unsigned int)time(NULL));
@@ -34,8 +36,11 @@ int main() {
 			cout << "\n";
 		}
 
+		cout << "Bingo line: " << bingo << "\n";
+		if (bingo >= 5) break;
 		cout << "EXIT(Enter 0)" << "\n";
 		cout << "Enter the number: ";
+
 		int num;
 		cin >> num;
 
@@ -47,8 +52,9 @@ int main() {
 		if (num < 0 || num>25) {
 			continue;
 		}
-
 		changeNum(num);
+		bingo = 0;
+		bingoCheck();
 	}
 	return 0;
 }
@@ -67,9 +73,29 @@ void shuffle() {
 
 void changeNum(int num) {
 	for (int i = 0; i < 25; i++) {
-		if (numArray[i] == num) {
-			numArray[i] = INT_MIN;
-		}
+		if (numArray[i] == num) numArray[i] = INT_MIN;
+
 	}
+}
+
+void bingoCheck() {
+	int check1 = 0, check2 = 0;
+	for (int i = 0; i < 5; i++) {
+		check1 = 0, check2 = 0;
+		for (int j = 0; j < 5; j++) {
+			if (numArray[i * 5 + j] == INT_MIN) check1++;
+			if (numArray[j * 5 + i] == INT_MIN) check2++;
+		}
+		if (check1 == 5) bingo++;
+		if (check2 == 5) bingo++;
+	}
+
+	check1 = 0, check2 = 0;
+	for (int i = 0, j = 4; i < 25; i += 6, j += 4) {
+		if (numArray[i] == INT_MIN) check1++;
+		if (numArray[j] == INT_MIN) check2++;
+	}
+	if (check1 == 5) bingo++;
+	if (check2 == 5) bingo++;
 }
 
