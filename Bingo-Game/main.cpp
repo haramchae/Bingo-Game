@@ -9,6 +9,11 @@ enum AI_MODE {
 	HARD_MODE
 };
 
+enum LINE_NUMBER {
+	D_NUM1 = 10,
+	D_NUM2
+};
+
 int numArray[25] = {};
 int AIArray[25] = {};
 int bingo = 0;
@@ -23,6 +28,7 @@ void printBingo(int Array[]);
 void changeNum(int index);
 void AISelectNum();
 void bingoCheck(int TArray[]);
+void hardSelect();
 
 int main() {
 	srand((unsigned int)time(NULL));
@@ -35,7 +41,7 @@ int main() {
 	shuffle();
 
 	while (true) {
-		system("cls");
+		//system("cls");
 		cout << "Choose the mode you want to play" << "\n";
 		cout << "1. ESAY mode" << "\n";
 		cout << "2. HARD mode" << "\n";
@@ -63,8 +69,6 @@ int main() {
 			cout << "Hard mode" << "\n";
 			break;
 		}
-
-
 		printBingo(AIArray);
 		cout << "AI Bingo line: " << AIBingo << "\n";
 
@@ -88,9 +92,6 @@ int main() {
 
 		int num;
 		cin >> num;
-		
-
-		
 
 		if (num == 0) {
 			cout << "Game Exit!\n";
@@ -110,9 +111,7 @@ int main() {
 			bingo = 0;
 			bingoCheck(AIArray);
 			AIBingo = bingo;
-			
 		}
-		
 	}
 	return 0;
 }
@@ -166,22 +165,21 @@ void AISelectNum() {
 	switch (AIModeNum)
 	{
 	case EASY_MODE:
-		
 		for (int i = 0; i < 25; i++) {
 			if (AIArray[i] != INT_MIN) {
 				indexV.push_back(i);
 			}
 		}
-		randomIndex = indexV[rand() % indexV.size()];
-		cout << "random Index: " << randomIndex << "\n";
+		randomIndex = indexV[rand() % indexV.size()];	
+		AINum = AIArray[randomIndex];
+		changeNum(AIArray[randomIndex]);
 		break;
 	case HARD_MODE:
+		hardSelect();
 		break;
 	default:
 		break;
 	}
-	AINum = AIArray[randomIndex];
-	changeNum(AIArray[randomIndex]);
 }
 
 void bingoCheck(int TArray[]) {
@@ -203,5 +201,78 @@ void bingoCheck(int TArray[]) {
 	}
 	if (check1 == 5) bingo++;
 	if (check2 == 5) bingo++;
+}
+
+void hardSelect() {
+	int line = 0;
+	int tempCount = 0;
+	int StarCount1 = 0;
+	int StarCount2 = 0;
+
+	for (int i = 0; i < 5; i++) {
+		StarCount1 = 0, StarCount2 = 0;
+		for (int j = 0; j < 5; j++) {
+			if (AIArray[i * 5 + j] == INT_MIN) StarCount1++;
+			if (AIArray[j * 5 + i] == INT_MIN) StarCount2++;
+		}
+		if (StarCount1 < 5 && tempCount < StarCount1) {
+			line = i;
+			tempCount = StarCount1;
+		}
+		else if (StarCount2 < 5 && tempCount < StarCount2) {
+			line = i + 5;
+			tempCount = StarCount2;
+		}
+	}
+
+	StarCount1 = 0, StarCount2 = 0;
+	for (int i = 0, j = 4; i < 25; i += 6, j += 4) {
+		if (AIArray[i] == INT_MIN) StarCount1++;
+		if (AIArray[j] == INT_MIN) StarCount2++;
+	}
+	if (StarCount1 < 5 && tempCount < StarCount1) {
+		line = D_NUM1;
+		tempCount = StarCount1;
+	}
+	else if (StarCount2 < 5 && tempCount < StarCount2) {
+		line = D_NUM2;
+		tempCount = StarCount2;
+	}
+	if (line == D_NUM1) {
+		for (int i = 0; i < 25; i += 6) {
+			if (AIArray[i] != INT_MIN) {
+				AINum = AIArray[i];
+				changeNum(AIArray[i]);
+				break;
+			}
+		}
+	}
+	else if (line == D_NUM2) {
+		for (int i = 5; i <= 20; i += 4) {
+			if (AIArray[i] != INT_MIN) {
+				AINum = AIArray[i];
+				changeNum(AIArray[i]);
+				break;
+			}
+		}
+	}
+	else if (line <= 4) {
+		for (int i = 0; i < 5; i++) {
+			if (AIArray[line * 5 + i] != INT_MIN) {
+				AINum = AIArray[line * 5 + i];
+				changeNum(AIArray[line * 5 + i]);
+				break;
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < 5; i++) {
+			if (AIArray[i*5 + (line-5)] != INT_MIN) {
+				AINum = AIArray[i * 5 + (line - 5)];
+				changeNum(AIArray[i * 5 + (line - 5)]);
+				break;
+			}
+		}
+	}
 }
 
